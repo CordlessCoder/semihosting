@@ -61,7 +61,7 @@ pub struct ArgsIn<'a>(sys::ArgsBytesRef<'a>);
 /// let mut buf = [MaybeUninit::uninit(); 64];
 /// let args = semihosting::experimental::env::args_in(&mut buf)?;
 /// let mut verbose = false;
-/// for arg in &args {
+/// for arg in args {
 ///     if let Ok("-v") = arg {
 ///         verbose = true;
 ///     }
@@ -73,8 +73,7 @@ pub fn args_in(buf: &mut [MaybeUninit<u8>]) -> io::Result<ArgsIn<'_>> {
     sys::args_bytes_in(buf).map(ArgsIn)
 }
 
-#[allow(clippy::copy_iterator)] // TODO(args)
-impl<'a> Iterator for &ArgsIn<'a> {
+impl<'a> Iterator for ArgsIn<'a> {
     type Item = Result<&'a str, str::Utf8Error>;
     fn next(&mut self) -> Option<Self::Item> {
         let arg = sys::next_ref(&self.0)?;
